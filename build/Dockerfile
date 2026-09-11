@@ -1,9 +1,9 @@
 # GLOBAL ARGUMENT: Base Image
-ARG BASE_IMAGE=registry.access.redhat.com/ubi9/ubi:9.4
+ARG BASE_IMAGE=registry.access.redhat.com/ubi9/ubi:latest
 
 # Multi-stage docker build
 # Build stage
-FROM golang:1.22 AS builder
+FROM golang:1.26.8 AS builder
 
 ARG TARGETOS=linux
 ARG TARGETARCH
@@ -51,17 +51,17 @@ RUN if [ $(rpm -E %rhel) -eq 9 ]; then \
     fi && yum clean all
 
 #Installing Kubectl
-ENV KUBE_LATEST_VERSION="v1.31.0"
+ENV KUBE_LATEST_VERSION="v1.37"
 RUN curl -L https://storage.googleapis.com/kubernetes-release/release/${KUBE_LATEST_VERSION}/bin/linux/${TARGETARCH}/kubectl -o     /usr/bin/kubectl && \
     chmod 755 /usr/bin/kubectl
 
 #Installing crictl binaries
-RUN curl -L https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.31.1/crictl-v1.31.1-linux-${TARGETARCH}.tar.gz --output crictl-v1.31.1-linux-${TARGETARCH}.tar.gz && \
-    tar zxvf crictl-v1.31.1-linux-${TARGETARCH}.tar.gz -C /sbin && \
+RUN curl -L https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.37.0/crictl-v1.37.0-linux-${TARGETARCH}.tar.gz --output crictl-v1.37.0-linux-${TARGETARCH}.tar.gz && \
+    tar zxvf crictl-v1.37.0-linux-${TARGETARCH}.tar.gz -C /sbin && \
     chmod 755 /sbin/crictl
 
 #Installing promql cli binaries
-RUN curl -L https://github.com/chaosnative/promql-cli/releases/download/3.0.0-beta6/promql_linux_${TARGETARCH} --output /usr/bin/promql && chmod 755 /usr/bin/promql
+RUN curl -L https://github.com/chaosnative/promql-cli/releases/download/1.1.0/promql_linux_${TARGETARCH} --output /usr/bin/promql && chmod 755 /usr/bin/promql
 
 #Installing pause cli binaries
 RUN curl -L https://github.com/litmuschaos/test-tools/releases/download/${LITMUS_VERSION}/pause-linux-${TARGETARCH} --output /usr/bin/pause && chmod 755 /usr/bin/pause
